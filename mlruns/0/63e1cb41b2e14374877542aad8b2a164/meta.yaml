@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Ludo/Documents/School/Master_Thesis/StonksMarketPrediction/mlruns/0/63e1cb41b2e14374877542aad8b2a164/artifacts
+end_time: 1615557004843
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+name: ''
+run_id: 63e1cb41b2e14374877542aad8b2a164
+run_uuid: 63e1cb41b2e14374877542aad8b2a164
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1615557004242
+status: 3
+tags: []
+user_id: Ludo
