@@ -64,10 +64,11 @@ def compute_RSI(df, n, price_column='Close', diff_column='Difference'):
 
     return rsi
 
-
-
-def get_data(folder_prefix, file):
-    df = pd.read_csv(f"{folder_prefix}/{file}", delimiter=' ')
+def get_data(path, file=None):
+    if file is None:
+        df = pd.read_csv(path, delimiter=' ')
+    else:
+        df = pd.read_csv(f"{path}/{file}", delimiter=' ')
     __trim_columns__(df)
     return df
 
@@ -77,6 +78,7 @@ def get_data(folder_prefix, file):
 
 if __name__ == '__main__':
     df = get_data('./data', 'AAPL.txt')
+    df = get_data('./data/AAPL.txt')
     df['Difference'] = compute_price_difference(df)
     df['DiffPercent'] = compute_percentage_diff(df)
     df['Tendency'] = compute_tendency_percentage(df, thresh_diff=2.0)
