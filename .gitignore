@@ -2,7 +2,7 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,data,venv
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,jupyternotebooks,data,venv
 
-*/mlruns*/
+mlruns/
 
 ### Data ###
 *.csv
