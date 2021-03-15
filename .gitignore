@@ -2,6 +2,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,data,venv
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,jupyternotebooks,data,venv
 
+*/mlruns*/
+
 ### Data ###
 *.csv
 *.dat
@@ -13,7 +15,7 @@
 *.pptx
 *.sdf
 *.tax2010
-*.vcf
+*.vcfw
 *.xml
 
 ### JupyterNotebooks ###
