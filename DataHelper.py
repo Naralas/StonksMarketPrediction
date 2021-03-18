@@ -19,8 +19,8 @@ def __trim_columns__(df):
             column_names.append(re.sub(r'^.*?\.', '', column))
         df.columns = column_names
 
-def compute_price_difference(df, price_column='Close'):
-    values = df[price_column]
+def compute_column_difference(df, column='Close'):
+    values = df[column]
     differences = list(map(lambda pair: pair[1]-pair[0], pairwise(values)))
     differences.insert(0, 0)
 
@@ -36,13 +36,18 @@ def compute_tendency(df, diff_column='Difference', thresh_diff=0.04, labels=['lo
 def compute_percentage_diff(df, price_column='Close', diff_column='Difference'):
     return df.apply(lambda r: r[diff_column] / (r[price_column] - r[diff_column]) * 100.0, axis=1)
     
-def compute_tendency_percentage(df, price_column='Close', diff_column='Difference', thresh_diff=1.0, labels=['lower', 'stay', 'higher']):
+def compute_tendency_percentage(df, price_column='Close', diff_column='Difference', thresh_diff=None, labels=['lower', 'stay', 'higher']):
     percentages = compute_percentage_diff(df, price_column, diff_column)
-    tendencies = pd.cut(x=percentages,
-                bins=[-math.inf, 0-thresh_diff, 0+thresh_diff, math.inf],
-                labels=labels)
+
+    if thresh_diff is not None:
+        tendencies = pd.cut(x=percentages,
+                    bins=[-math.inf, 0-thresh_diff, 0+thresh_diff, math.inf],
+                    labels=labels)
+    else:
+        tendencies = pd.cut(x=percentages, bins=[-math.inf, 0, math.inf], labels=labels)
 
     return tendencies
+
 
 def compute_RSI(df, n, price_column='Close', diff_column='Difference'):
     """ Code adapted from https://stackoverflow.com/questions/20526414/relative-strength-index-in-python-pandas"""
@@ -71,8 +76,6 @@ def get_data(path, file=None):
         df = pd.read_csv(f"{path}/{file}", delimiter=' ')
     __trim_columns__(df)
     return df
-
-
 
 
 
