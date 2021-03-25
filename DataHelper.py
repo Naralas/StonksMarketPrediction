@@ -103,7 +103,7 @@ def get_data(path, file=None):
     __trim_columns__(df)
     return df
 
-def normalize_df(df, features):
+def normalize_df(df, features, scale=(0,1)):
     # filter to get only the numerical columns
     numerical_columns = df.select_dtypes(include=np.number).columns.tolist()
     # filter to find the intersection with the features (that need to be scaled)
@@ -111,7 +111,7 @@ def normalize_df(df, features):
 
     # filter the columns and normalize
     df_n = df.loc[:, target_column_names]
-    minmax_scaler = preprocessing.MinMaxScaler()
+    minmax_scaler = preprocessing.MinMaxScaler(scale)
     df_n = pd.DataFrame(minmax_scaler.fit_transform(df_n))
     df_n.columns = target_column_names
 
@@ -139,13 +139,18 @@ def features_pipeline(path, price_column='Close', predict_n=1, thresh_diff=0.5, 
     df['GAP'] = compute_GAP(df)
     df['Volume_diff'] = compute_column_difference(df, column='Volume')
     df['Next'] = shift_values(df, column='Tendency', periods=-predict_n)
+    
+    
     df = df.dropna()
 
+    #print(f"Before : {df.isna().any()}")
     feature_names = [col for col in df.columns.values if col not in dataset_column_names]
 
     if normalize_features:
         df = normalize_df(df, feature_names + base_features_normalize)
+    #print(f"After : {df.isna().any()}")
 
+    df = df.dropna()
 
     return df, feature_names
 
@@ -162,8 +167,9 @@ if __name__ == '__main__':
     df['gap'] = compute_GAP(df)
 
     df, feature_names = features_pipeline('./data/AAPL.txt', 'Close', 1,  
-        thresh_diff=None, verbose=False, normalize_features=True, base_features_normalize=['Volume'])
+        thresh_diff=None, normalize_features=True, base_features_normalize=['Volume'], verbose=False)
     #print(feature_names)
+
     print(df.head(20))
 
      

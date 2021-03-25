@@ -11,16 +11,22 @@ def train(dataloader, model, n_epochs, optimizer, loss_fn, device):
             optimizer.zero_grad()
 
             #print(target.shape)
+            if(torch.isnan(data).any()):
+                print("nan detected !")
+                print(f"Data : {data}")
             output = model(data)
             #print(output.shape)
+            #print(f"Target : {target}")
+            #print(f"Output : {output}")
             
             loss = loss_fn(output, target.unsqueeze(1))
             acc = binary_acc(output, target.unsqueeze(1))
-
+            #print(f"[Before] data : {loss.data}, grad : {loss.grad}")
             epoch_acc += acc.item()
             loss.backward()
             optimizer.step()
-
+            #print(f"[After] data : {loss.data}, grad : {loss.grad}")
+            #break
         print(f"Epoch {epoch+1}, loss: {loss.item()}, accuracy : {epoch_acc / len(dataloader):.2f}")
 
 def binary_acc(output, target):
