@@ -4,6 +4,8 @@ import numpy as np
 import math
 
 from itertools import tee, islice
+from sklearn import preprocessing
+
 
 # modified from https://docs.python.org/3/library/itertools.html#itertools-recipes
 def pairwise(iterable, offset=None):
@@ -101,8 +103,26 @@ def get_data(path, file=None):
     __trim_columns__(df)
     return df
 
-def features_pipeline(path, price_column='Close', predict_n=1, thresh_diff=0.5, verbose=False, scale_features=False):
+def normalize_df(df, features):
+    # filter to get only the numerical columns
+    numerical_columns = df.select_dtypes(include=np.number).columns.tolist()
+    # filter to find the intersection with the features (that need to be scaled)
+    target_column_names = [col for col in numerical_columns if col in features]
+
+    # filter the columns and normalize
+    df_n = df.loc[:, target_column_names]
+    minmax_scaler = preprocessing.MinMaxScaler()
+    df_n = pd.DataFrame(minmax_scaler.fit_transform(df_n))
+    df_n.columns = target_column_names
+
+
+    # replace the columns in the dataframe with the normalized data
+    df.loc[:, target_column_names] = df_n
+    return df
+
+def features_pipeline(path, price_column='Close', predict_n=1, thresh_diff=0.5, normalize_features=False, base_features_normalize=[], verbose=False):
     df = get_data(path)
+    dataset_column_names = df.columns.values
     
     df['Difference'] = compute_column_difference(df, column=price_column, periods_offset=predict_n)
     df['PercentageDiff'] = compute_percentage_diff(df)
@@ -120,7 +140,14 @@ def features_pipeline(path, price_column='Close', predict_n=1, thresh_diff=0.5, 
     df['Volume_diff'] = compute_column_difference(df, column='Volume')
     df['Next'] = shift_values(df, column='Tendency', periods=-predict_n)
     df = df.dropna()
-    return df
+
+    feature_names = [col for col in df.columns.values if col not in dataset_column_names]
+
+    if normalize_features:
+        df = normalize_df(df, feature_names + base_features_normalize)
+
+
+    return df, feature_names
 
 
 
@@ -134,7 +161,9 @@ if __name__ == '__main__':
     df['RSI'] = compute_RSI(df, 10)
     df['gap'] = compute_GAP(df)
 
-    df = features_pipeline('./data/AAPL.txt', 'Close', 1,  None, False, False)
+    df, feature_names = features_pipeline('./data/AAPL.txt', 'Close', 1,  
+        thresh_diff=None, verbose=False, normalize_features=True, base_features_normalize=['Volume'])
+    #print(feature_names)
     print(df.head(20))
 
      
