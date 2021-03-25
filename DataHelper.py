@@ -90,12 +90,36 @@ def compute_RSI(df, n, price_column='Close', diff_column='Difference'):
 
     return rsi
 
+def compute_MA(df, price_column, n=10):
+    return df[price_column].rolling(n).mean()
+
 def get_data(path, file=None):
     if file is None:
         df = pd.read_csv(path, delimiter=' ')
     else:
         df = pd.read_csv(f"{path}/{file}", delimiter=' ')
     __trim_columns__(df)
+    return df
+
+def features_pipeline(path, price_column='Close', predict_n=1, thresh_diff=0.5, verbose=False, scale_features=False):
+    df = get_data(path)
+    
+    df['Difference'] = compute_column_difference(df, column=price_column, periods_offset=predict_n)
+    df['PercentageDiff'] = compute_percentage_diff(df)
+    df['Tendency'] = compute_tendency_percentage(df, diff_column='Difference', labels=['lower','higher'])
+    
+    if verbose:
+        value_counts = df.Tendency.value_counts().to_dict()
+        for value, count in value_counts.items():
+            print(f"[{value}] : {count} ({count * 100.0 / len(df['Tendency']):.1f}%)")
+            
+    df['MA'] = compute_MA(df, price_column)
+    df['MA_diff'] = compute_MA(df, price_column, n=20) - compute_MA(df, price_column, n=10)
+    df['RSI'] = compute_RSI(df, n=10, price_column=price_column, diff_column='Difference')
+    df['GAP'] = compute_GAP(df)
+    df['Volume_diff'] = compute_column_difference(df, column='Volume')
+    df['Next'] = shift_values(df, column='Tendency', periods=-predict_n)
+    df = df.dropna()
     return df
 
 
@@ -109,6 +133,8 @@ if __name__ == '__main__':
     df['Tendency'] = compute_tendency_percentage(df, thresh_diff=2.0)
     df['RSI'] = compute_RSI(df, 10)
     df['gap'] = compute_GAP(df)
-    #print(df.head(20))
+
+    df = features_pipeline('./data/AAPL.txt', 'Close', 1,  None, False, False)
+    print(df.head(20))
 
      
