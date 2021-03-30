@@ -133,10 +133,11 @@ def features_pipeline(path, price_column='Close', predict_n=1, thresh_diff=0.5, 
         for value, count in value_counts.items():
             print(f"[{value}] : {count} ({count * 100.0 / len(df['Tendency']):.1f}%)")
             
-    df['MA'] = compute_MA(df, price_column)
+    df['MA(10)'] = compute_MA(df, price_column, n=10)
     df['MA_diff'] = compute_MA(df, price_column, n=20) - compute_MA(df, price_column, n=10)
-    df['RSI'] = compute_RSI(df, n=10, price_column=price_column, diff_column='Difference')
+    df['RSI(14)'] = compute_RSI(df, n=14, price_column=price_column, diff_column='Difference')
     df['GAP'] = compute_GAP(df)
+    df['RSI_diff'] = compute_column_difference(df, column='RSI(14)', periods_offset=predict_n)
     df['Volume_diff'] = compute_column_difference(df, column='Volume')
     df['Next'] = shift_values(df, column='Tendency', periods=-predict_n)
     
@@ -168,7 +169,7 @@ if __name__ == '__main__':
 
     df, feature_names = features_pipeline('./data/AAPL.txt', 'Close', 1,  
         thresh_diff=None, normalize_features=True, base_features_normalize=['Volume'], verbose=False)
-    #print(feature_names)
+    print(feature_names)
 
     print(df.head(20))
 
