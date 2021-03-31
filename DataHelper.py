@@ -103,7 +103,7 @@ def get_data(path, file=None):
     __trim_columns__(df)
     return df
 
-def normalize_df(df, features, scale=(0,1)):
+def normalize_df(df, features, scale=(-1,1)):
     # filter to get only the numerical columns
     numerical_columns = df.select_dtypes(include=np.number).columns.tolist()
     # filter to find the intersection with the features (that need to be scaled)
@@ -134,10 +134,10 @@ def features_pipeline(path, price_column='Close', predict_n=1, thresh_diff=0.5, 
             print(f"[{value}] : {count} ({count * 100.0 / len(df['Tendency']):.1f}%)")
             
     df['MA(10)'] = compute_MA(df, price_column, n=10)
-    df['MA_diff'] = compute_MA(df, price_column, n=20) - compute_MA(df, price_column, n=10)
+    df['MA(20) - MA(10)'] = compute_MA(df, price_column, n=20) - compute_MA(df, price_column, n=10)
     df['RSI(14)'] = compute_RSI(df, n=14, price_column=price_column, diff_column='Difference')
     df['GAP'] = compute_GAP(df)
-    df['RSI_diff'] = compute_column_difference(df, column='RSI(14)', periods_offset=predict_n)
+    df['RSI_Diff'] = compute_column_difference(df, column='RSI(14)', periods_offset=predict_n)
     df['Volume_diff'] = compute_column_difference(df, column='Volume')
     df['Next'] = shift_values(df, column='Tendency', periods=-predict_n)
     
@@ -170,6 +170,7 @@ if __name__ == '__main__':
     df, feature_names = features_pipeline('./data/AAPL.txt', 'Close', 1,  
         thresh_diff=None, normalize_features=True, base_features_normalize=['Volume'], verbose=False)
     print(feature_names)
+    print(df[:, ['DiffPercent', 'Difference']])
 
     print(df.head(20))
 
