@@ -1,0 +1,26 @@
+{
+    "os": "Windows-10-10.0.19041-SP0",
+    "python": "3.7.7",
+    "heartbeatAt": "2021-03-31T09:50:52.813380",
+    "startedAt": "2021-03-31T09:50:51.538604",
+    "docker": null,
+    "gpu": "GeForce GTX 1650",
+    "gpu_count": 1,
+    "cpu_count": 12,
+    "cuda": null,
+    "args": [
+        "-f",
+        "C:\\Users\\Ludo\\AppData\\Roaming\\jupyter\\runtime\\kernel-419242d6-39d9-47c3-a4fc-5983a07754b6.json"
+    ],
+    "state": "running",
+    "program": "DL_StockPricePrediction.ipynb",
+    "root": "C:/Users/Ludo/Documents/School/Master_Thesis/StonksMarketPrediction",
+    "git": {
+        "remote": "https://github.com/Naralas/StonksMarketPrediction.git",
+        "commit": "54b4b9938ef80428d7124c1dfc3716a969a4505f"
+    },
+    "email": "ludovic.herbelin@gmail.com",
+    "host": "Ludo-Laptop",
+    "username": "Ludo",
+    "executable": "c:\\users\\ludo\\documents\\school\\master_thesis\\stonksmarketprediction\\venv\\scripts\\python.exe"
+}

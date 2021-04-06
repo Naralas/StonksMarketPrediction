@@ -2,7 +2,9 @@ import pandas as pd
 import re
 import numpy as np
 import math
+import ta
 
+from pathlib import Path
 from itertools import tee, islice
 from sklearn import preprocessing
 
@@ -24,7 +26,7 @@ def pairwise(iterable, offset=None):
 def __trim_columns__(df):
         column_names = []
         for column in df.columns.values.tolist():
-            # get substring starting from what is after the dot 
+            # get substring starting from what is after the dot IE removing "AAPL" from "AAPL.Close"
             column_names.append(re.sub(r'^.*?\.', '', column))
         df.columns = column_names
 
@@ -72,28 +74,11 @@ def compute_GAP(df, close_column='Close', open_column='Open'):
     gaps = list(map(lambda price_pair: price_pair[0] - price_pair[1], zip(shifted_close, df[open_column])))
     return gaps
 
-def compute_RSI(df, n, price_column='Close', diff_column='Difference'):
-    """ Code adapted from https://stackoverflow.com/questions/20526414/relative-strength-index-in-python-pandas"""
-    difference = df[diff_column] 
+def compute_RSI(df, n, price_column='Close'):
+    return ta.momentum.RSIIndicator(df[price_column], window=n).rsi()
 
-    # Make the positive gains (up) and negative gains (down) Series
-    up, down = difference.copy(), difference.copy()
-    up[up < 0] = 0
-    down[down > 0] = 0
-
-
-    # Calculate the SMA
-    roll_up2 = up.rolling(n).mean()
-    roll_down2 = down.abs().rolling(n).mean()
-
-    # Calculate the RSI based on SMA
-    rs = roll_up2 / roll_down2
-    rsi = 100.0 - (100.0 / (1.0 + rs))
-
-    return rsi
-
-def compute_MA(df, price_column, n=10):
-    return df[price_column].rolling(n).mean()
+def compute_SMA(df, price_column, n=10):
+    return ta.trend.SMAIndicator(df[price_column], window=n).sma_indicator()
 
 def get_data(path, file=None):
     if file is None:
@@ -102,6 +87,33 @@ def get_data(path, file=None):
         df = pd.read_csv(f"{path}/{file}", delimiter=' ')
     __trim_columns__(df)
     return df
+
+def import_folder(path, files_pattern="*", recursive=False, 
+        compute_features=True, predict_n=1, normalize_features=False):
+
+    files = Path(path)
+    files = files.rglob(files_pattern) if recursive else files.glob(files_pattern)
+    if not compute_features:
+        return [(get_data(file), file.name) for file in files]
+    else:
+        return  [
+                    (features_pipeline(file, predict_n=predict_n, normalize_features=normalize_features), file.name) 
+                for file in files]
+    
+
+def merge_datasets(*args):
+    if any((type(arg)) is not pd.DataFrame for arg in args):
+        raise Exception("Arguments given to the function should be dataframes.") 
+    if len(args) < 2:
+        raise Exception("You need to pass multiple dataframes.")
+    
+    df_base = args[0]
+
+    for df in args[1:]:
+        df_base = df_base.append(df)
+    
+    return df_base
+
 
 def normalize_df(df, features, scale=(-1,1)):
     # filter to get only the numerical columns
@@ -133,14 +145,24 @@ def features_pipeline(path, price_column='Close', predict_n=1, thresh_diff=0.5, 
         for value, count in value_counts.items():
             print(f"[{value}] : {count} ({count * 100.0 / len(df['Tendency']):.1f}%)")
             
-    df['MA(10)'] = compute_MA(df, price_column, n=10)
-    df['MA(20) - MA(10)'] = compute_MA(df, price_column, n=20) - compute_MA(df, price_column, n=10)
-    df['RSI(14)'] = compute_RSI(df, n=14, price_column=price_column, diff_column='Difference')
+    df['MA(10)'] = compute_SMA(df, price_column, n=10)
+    df['MA(20) - MA(10)'] = compute_SMA(df, price_column, n=20) - compute_SMA(df, price_column, n=10)
+    df['RSI(14)'] = compute_RSI(df, n=14, price_column=price_column)
     df['GAP'] = compute_GAP(df)
     df['RSI_Diff'] = compute_column_difference(df, column='RSI(14)', periods_offset=predict_n)
     df['Volume_diff'] = compute_column_difference(df, column='Volume')
     df['Next'] = shift_values(df, column='Tendency', periods=-predict_n)
-    
+    macd = ta.trend.MACD(df[price_column])
+    df['MACD'] = macd.macd()
+    df['MACD_diff'] = macd.macd_diff()
+    df['MACD_signal'] = macd.macd_signal()
+    bg_band = ta.volatility.BollingerBands(df[price_column])
+    df['BG_L_Band'] = bg_band.bollinger_lband()
+    df['BG_H_Band'] = bg_band.bollinger_hband()
+    df['BG_L_Band_Indicator'] = bg_band.bollinger_lband_indicator()
+    df['BG_H_Band_Indicator'] = bg_band.bollinger_hband_indicator()
+    df['ROC'] = ta.momentum.ROCIndicator(df[price_column]).roc()
+    df['StochOsc'] = ta.momentum.StochasticOscillator(df['High'], df['Low'], df[price_column]).stoch()
     
     df = df.dropna()
 
@@ -164,14 +186,14 @@ if __name__ == '__main__':
     df['Diff4'] = compute_column_difference(df, column='Close', periods_offset=4)
     df['DiffPercent'] = compute_percentage_diff(df)
     df['Tendency'] = compute_tendency_percentage(df, thresh_diff=2.0)
-    df['RSI'] = compute_RSI(df, 10)
+    df['RSI(14)'] = compute_RSI(df, 14)
     df['gap'] = compute_GAP(df)
 
     df, feature_names = features_pipeline('./data/AAPL.txt', 'Close', 1,  
         thresh_diff=None, normalize_features=True, base_features_normalize=['Volume'], verbose=False)
-    print(feature_names)
-    print(df[:, ['DiffPercent', 'Difference']])
 
-    print(df.head(20))
+    print(df.head(20), feature_names)
+    df_merged = merge_datasets(df, df, df, df)
 
-     
+    datasets = import_folder('./data', files_pattern="*.txt")
+    print([x[1] for x in datasets])
