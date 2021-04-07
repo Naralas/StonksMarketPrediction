@@ -6,12 +6,12 @@ import numpy as np
 def train(dataloader, model, n_epochs, optimizer, loss_fn, device, project_label=None):
     for params in optimizer.param_groups:
         lr = params['lr']
-    #wandb.init(project=f"Project")
-    #config = wandb.config
-    #config.learning_rate = lr
+    wandb.init(project=f"Project")
+    config = wandb.config
+    config.learning_rate = lr
     model.train()
     
-    #wandb.watch(model)
+    wandb.watch(model)
     for epoch in range(n_epochs):
         epoch_acc = 0
         for data, target in dataloader:
@@ -31,8 +31,8 @@ def train(dataloader, model, n_epochs, optimizer, loss_fn, device, project_label
 
         acc = epoch_acc / len(dataloader)
         #print(f"Non zero : {sum_non_zero}, {sum_non_zero / len(dataloader)}")
-        #wandb.log({"loss": loss.item(), "accuracy":acc})
-        print(f"Epoch {epoch+1}, loss: {loss.item()}, accuracy : {acc:.2f}")
+        wandb.log({"loss": loss.item(), "accuracy":acc})
+        #print(f"Epoch {epoch+1}, loss: {loss.item()}, accuracy : {acc:.2f}")
 
 def predict(dataloader, model, device):
     model.eval()

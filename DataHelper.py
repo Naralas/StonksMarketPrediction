@@ -145,8 +145,12 @@ def features_pipeline(path, price_column='Close', predict_n=1, thresh_diff=0.5, 
         for value, count in value_counts.items():
             print(f"[{value}] : {count} ({count * 100.0 / len(df['Tendency']):.1f}%)")
             
-    df['MA(10)'] = compute_SMA(df, price_column, n=10)
-    df['MA(20) - MA(10)'] = compute_SMA(df, price_column, n=20) - compute_SMA(df, price_column, n=10)
+    df['SMA(10)'] = compute_SMA(df, price_column, n=10)
+    df['SMA(20)'] = compute_SMA(df, price_column, n=20)
+    df['EMA(14)'] = ta.trend.EMAIndicator(df[price_column], window=14).ema_indicator()
+    df['EMA_Diff'] = compute_column_difference(df, column="EMA(14)", periods_offset=predict_n)
+    df['SMA(20) - SMA(10)'] = compute_SMA(df, price_column, n=20) - compute_SMA(df, price_column, n=10)
+    df['LowLen'] = df.apply(lambda r: np.minimum(r['Open'], r['Close']) - r['Low'], axis=1)
     df['RSI(14)'] = compute_RSI(df, n=14, price_column=price_column)
     df['GAP'] = compute_GAP(df)
     df['RSI_Diff'] = compute_column_difference(df, column='RSI(14)', periods_offset=predict_n)
@@ -156,6 +160,7 @@ def features_pipeline(path, price_column='Close', predict_n=1, thresh_diff=0.5, 
     df['MACD'] = macd.macd()
     df['MACD_diff'] = macd.macd_diff()
     df['MACD_signal'] = macd.macd_signal()
+    df['BodyLen'] = (df['Close'] - df['Open']).abs()
     bg_band = ta.volatility.BollingerBands(df[price_column])
     df['BG_L_Band'] = bg_band.bollinger_lband()
     df['BG_H_Band'] = bg_band.bollinger_hband()
