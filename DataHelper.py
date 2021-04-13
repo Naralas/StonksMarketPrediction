@@ -132,14 +132,18 @@ def normalize_df(df, features, scale=(-1,1)):
     df.loc[:, target_column_names] = df_n
     return df
 
-def features_pipeline(path, price_column='Close', predict_n=1, thresh_diff=0.5, normalize_features=False, base_features_normalize=[], verbose=False):
+def features_pipeline(path, price_column='Close', predict_n=1, thresh_diff=None, normalize_features=False, base_features_normalize=[], verbose=False):
     df = get_data(path)
     dataset_column_names = df.columns.values
     
     df['Difference'] = compute_column_difference(df, column=price_column, periods_offset=predict_n)
     df['PercentageDiff'] = compute_percentage_diff(df)
-    df['Tendency'] = compute_tendency_percentage(df, diff_column='Difference', labels=['lower','higher'])
     
+    if thresh_diff is None:
+        df['Tendency'] = compute_tendency_percentage(df, diff_column='Difference', labels=['lower','higher'])
+    else:
+        df['Tendency'] = compute_tendency_percentage(df, diff_column='Difference', thresh_diff=thresh_diff)
+
     if verbose:
         value_counts = df.Tendency.value_counts().to_dict()
         for value, count in value_counts.items():
