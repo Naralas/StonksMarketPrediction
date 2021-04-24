@@ -7,9 +7,11 @@ import matplotlib.ticker as mtick
 import pandas as pd
 from sklearn.metrics import plot_confusion_matrix, confusion_matrix, roc_curve, auc
 
-def plot_prices(date_series, price_series, quotation_name = "", ma_values = []):
+def plot_prices(date_series, price_series, quotation_name = "", ma_values = [], log_scale=False):
     x_values = [datetime.datetime.strptime(d,"%Y-%m-%d").date() for d in date_series]
     ax = plt.gca()
+    if log_scale:
+        ax.set(yscale='log')
     ax.set(title=f"{quotation_name} Stock Closing Price over time", ylabel='Closing price (USD)', xlabel='Time')
 
     formatter = mdates.DateFormatter("%m-%Y")
@@ -43,10 +45,10 @@ def __label_density_hist__(ax, n, bins, x=4, y=0.01, r=0, **kwargs):
         label = f"{(n[i] * 100.0 / total):.1f}%"
         ax.text(x_pos, y_pos, label, kwargs)
 
-def plot_density_hist(values_series):
+def plot_density_hist(series):
     ax = plt.gca()
 
-    counts, bins, patches = ax.hist(values_series, 50, histtype='bar', ec='black')
+    counts, bins, patches = ax.hist(series, 50, histtype='bar', ec='black')
     ax.tick_params(axis='x', rotation=90, labelsize=14)
     ax.set_xticks(bins)
     ax.set_title("Closing stock price differences")
@@ -56,8 +58,10 @@ def plot_density_hist(values_series):
 
     return ax
 
-def plot_normalized_histogram(series):
+def plot_normalized_histogram(series, log_scale=False):
     ax = plt.gca()
+    if log_scale:
+        ax.set(yscale='log')
     ax.set_title(f"Normalized histogram of series \"{series.name}\"")
     ax.hist(series, weights = np.ones_like(series) / len(series))
     return ax
