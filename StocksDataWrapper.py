@@ -9,6 +9,9 @@ from sklearn import preprocessing
 from DataHelper import *
 
 
+default_features_list = ['Close', 'Volume', 'MACD_diff', 'RSI(14)', 'PercentageDiff', 'LowLen', 'RSI_diff']
+
+
 class StocksDataWrapper:
     def __init__(self, df):
         self.df = df
@@ -60,6 +63,30 @@ class StocksDataWrapper:
             df_copy = self.df.copy()
             df_copy.loc[:, features_list] = df_n
             return df_copy
+    
+    
+    def get_datasets(self, n_splits=5, val_size=0.3, sequences=False, seq_len=5, y_column='NextPrice',
+                        features_list=default_features_list):
+
+        dataset = self.df.copy()
+        # filter only the features columns in the data and the target column
+        dataset = dataset.loc[:, features_list + [y_column]]
+
+        # replace the textual data (tendencies) by numerical values
+        for col in dataset.columns:
+            dataset[col] = dataset[col].replace({'higher':1, 'stay':0, 'lower':-1})
+
+        # remove the target column and build sequences if needed
+        X = dataset.loc[:, dataset.columns != y_column].values
+        if sequences:
+            # X.shape = (X_a, X_b) -> (X_a, seq_len, X_b)
+            X = build_sequences(X, seq_len=seq_len)
+
+        y = dataset[y_column].values
+        
+        return get_timeseries_splits(X, y, val_size=val_size, n_splits=n_splits)
+
+
 
     def get_numerical_features(self):
         return self.df.select_dtypes(include=np.number).columns.tolist()
@@ -68,6 +95,7 @@ class StocksDataWrapper:
         return self.df.loc[:, self.get_numerical_columns()]
 
     def get_unscaled_data(self, df=None):
+        #print(self.scaled_features)
         if df is None:
             df = self.df.loc[:, self.scaled_features]
         if self.minmax_scaler is None:
@@ -162,7 +190,7 @@ class StocksDataWrapper:
 
         dataset = cls(df)
         if compute_features: 
-            dataset.compute_features(predict_n=1, thresh_diff=thresh_diff) 
+            dataset.compute_features(predict_n=predict_n, thresh_diff=thresh_diff) 
         if normalize:
             dataset.normalize_data()
 
@@ -183,6 +211,8 @@ class StocksDataWrapper:
 
         return datasets_dict
 
+
+
 if __name__ == '__main__':
     dataset = StocksDataWrapper.read_from('./data/AAPL.txt')
 
@@ -192,20 +222,15 @@ if __name__ == '__main__':
     dataset['Tendency'] = compute_tendency(dataset['Close'].pct_change(), labels=['lower', 'higher'])
     dataset['RSI(14)'] =  ta.momentum.RSIIndicator(dataset['Close'], window=14).rsi()
     dataset['GAP'] = compute_GAP(dataset['Close'], dataset['Open'])
-    print(dataset.head())
+    #print(dataset.head())
     dataset.normalize_data(features_list=['Open', 'Close', 'Volume'])
-    print(dataset.get_unscaled_data(dataset.df))
+    #print(dataset.get_unscaled_data())
 
 
     dataset = StocksDataWrapper.read_from('./data/AAPL.txt')
-    dataset.compute_all_features(predict_n=5)
-    print(f"Final dataset :\r\n ", dataset.head(20))
-    """
-    df, feature_names = features_pipeline('./data/AAPL.txt', 'Close', 1, pct_change=True,
-        thresh_diff=None, normalize_features=True, base_features_normalize=['Volume'], verbose=False)
+    dataset.compute_features(predict_n=5)
+    splits = dataset.get_datasets(sequences=True)
+    print(splits)
+    
+    #print(f"Final dataset :\r\n ", dataset.head(20))
 
-    print(df.head(20), feature_names)
-    df_merged = merge_datasets(df, df, df, df)
-
-    datasets = import_folder('./data', files_pattern="*.txt")
-    print([x[1] for x in datasets])"""

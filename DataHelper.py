@@ -8,6 +8,29 @@ from pathlib import Path
 from itertools import tee, islice
 from sklearn import preprocessing
 
+from sklearn.model_selection import TimeSeriesSplit, train_test_split
+
+
+def build_sequences(data, seq_len=5):
+    n_sequences = len(data) - seq_len
+    return np.array([data[i:i+seq_len] for i in range(n_sequences)])
+
+
+def get_timeseries_splits(X, y, val_size=0.3, n_splits=5):
+    tscv = TimeSeriesSplit(n_splits=n_splits)
+
+    splits = []
+    for train_index, test_index in tscv.split(X):
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+        
+        if val_size != 0.0:
+            X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=val_size, shuffle=False)
+            splits.append((X_train, X_val, X_test, y_train, y_val, y_test))
+        else:
+            splits.append((X_train, X_test, y_train, y_test))
+        
+    return np.array(splits, dtype=object)
 
 def compute_GAP(close_series, open_series):
     shifted_close = close_series.shift(periods=1)
@@ -17,7 +40,6 @@ def compute_GAP(close_series, open_series):
 
 def compute_tendency(series, percentage=False, thresh_diff=None, labels=['lower', 'stay', 'higher']):
     if percentage:
-        print(series)
         series = series.pct_change()
     if thresh_diff is not None:
         if len(labels) is not 3:
