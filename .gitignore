@@ -4,6 +4,7 @@
 
 mlruns/
 wandb/
+*.code-workspace
 
 ### Data ###
 *.csv

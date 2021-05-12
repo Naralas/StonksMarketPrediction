@@ -6,7 +6,7 @@ import ta
 
 from pathlib import Path
 from sklearn import preprocessing
-from DataHelper import *
+from helpers.data_helper import *
 
 
 default_features_list = ['Close', 'Volume', 'MACD_diff', 'RSI(14)', 'PercentageDiff', 'LowLen', 'RSI_diff']
@@ -93,9 +93,13 @@ class StocksDataWrapper:
         
     def get_numerical_columns(self):
         return self.df.loc[:, self.get_numerical_columns()]
+    
+    def get_unscaled_values(self, values, base_name='Close'):
+        df = pd.DataFrame(data={base_name:values})
+        unscaled_df = self.get_unscaled_data(df)
+        return unscaled_df[base_name]
 
     def get_unscaled_data(self, df=None):
-        #print(self.scaled_features)
         if df is None:
             df = self.df.loc[:, self.scaled_features]
         if self.minmax_scaler is None:

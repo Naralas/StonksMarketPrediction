@@ -45,16 +45,32 @@ def __label_density_hist__(ax, n, bins, x=4, y=0.01, r=0, **kwargs):
         label = f"{(n[i] * 100.0 / total):.1f}%"
         ax.text(x_pos, y_pos, label, kwargs)
 
-def plot_density_hist(series):
+def plot_density_hist(series, periods=1, percentage_diff=False):
     ax = plt.gca()
 
     counts, bins, patches = ax.hist(series, 50, histtype='bar', ec='black')
     ax.tick_params(axis='x', rotation=90, labelsize=14)
     ax.set_xticks(bins)
     ax.set_title("Closing stock price differences")
-    ax.set_xlabel('Price difference between current day and previous day (percentage of price)')
-    ax.set_ylabel('Number of days')
+    ax.set_xlabel(f"Price difference in {periods} day(s)")
+    ax.set_ylabel("Number of periods")
     __label_density_hist__(ax, counts, bins, fontsize=14)
+
+    return ax
+
+def plot_losses(history, title):
+    ax = plt.gca()
+    loss = history.history["loss"]
+    epochs = range(len(loss))
+    ax.plot(epochs, loss, "b", label="Training loss")
+    if 'val_loss' in history.history:
+        val_loss = history.history["val_loss"]
+        ax.plot(epochs, val_loss, "r", label="Validation loss")
+    
+    ax.set_title(title)
+    ax.set_xlabel("Epoch")
+    ax.set_ylabel("Loss")
+    plt.legend(loc='best')
 
     return ax
 
@@ -85,6 +101,24 @@ def plot_filtered_class_features(df, n_cols, feature_names, class_column):
 
     return axs
 
+def plot_predictions(labels, predictions, title="Prices predictions and true values"):
+    ax = plt.gca()
+    ax.plot(labels, label="True prices")
+    ax.plot(predictions, label="Predictions")
+    
+
+    ax.set_title(title)
+    ax.set_ylabel("Price (USD)")
+    plt.legend(loc='best')
+
+    return ax
+    
+    if log_wandb:
+        wandb.log({"Unscaled prices and labels":wandb.Image(plt)})
+        plt.close()
+    else:
+        plt.show()
+        
 
 
 def plot_heatmap(labels, predictions, class_labels, normalize='all'):
