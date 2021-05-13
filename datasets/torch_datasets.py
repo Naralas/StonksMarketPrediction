@@ -4,8 +4,8 @@ import torch
 
 class StocksDataset(Dataset):
     def __init__(self, data, target):
-        self.data = torch.Tensor(data.values)
-        self.target = torch.Tensor(target.values)
+        self.data = torch.Tensor(data)
+        self.target = torch.Tensor(target)
         
     def __getitem__(self, index):
         datapoint = self.data[index]

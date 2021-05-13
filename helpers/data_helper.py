@@ -17,6 +17,9 @@ def build_sequences(data, seq_len=5):
 
 
 def get_timeseries_splits(X, y, val_size=0.3, n_splits=5):
+    if n_splits == 1:
+        return train_test_split(X,y, test_size=val_size, shuffle=False)
+
     tscv = TimeSeriesSplit(n_splits=n_splits)
 
     splits = []
