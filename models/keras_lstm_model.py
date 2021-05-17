@@ -1,19 +1,25 @@
-from models.base_model import BaseModel
 from keras import Model
 from keras.layers import LSTM, Input, Dense
 from keras.optimizers import Adam
+import tensorflow as tf
+from models.base_model import BaseModel
 
-class LSTMModel(BaseModel):
-    def __init__(self, config, inputs, learning_rate, loss):
-        super(LSTMModel, self).__init__(config)
-        self.build_model(inputs, learning_rate, loss)
 
-    def build_model(self, inputs, learning_rate, loss):
-        inputs = Input(shape=(inputs.shape[1], inputs.shape[2]))
+class LSTMModel(BaseModel, tf.keras.Model):
+    def __init__(self, config, seq_len, n_features, learning_rate, loss, **kwargs):
+        BaseModel.__init__(self, config)
+        tf.keras.Model.__init__(self, kwargs)
+        self.build_model(seq_len, n_features, learning_rate, loss)
+
+    def call(self, inputs):
+        x = self.lstm_out(inputs)
+        x = self.outputs(x)
+        return x
+
+    def build_model(self, seq_len, n_features, learning_rate, loss):
         #lstm_out = keras.layers.LSTM(100, dropout = 0.2, recurrent_dropout = 0.2)(inputs)
-        lstm_out = LSTM(100)(inputs)
+        self.lstm_out = LSTM(100)
         #dense_1 = keras.layers.Dense(8)(lstm_out)
-        outputs = Dense(1)(lstm_out)
+        self.outputs = Dense(1)
 
-        self.model = Model(inputs=inputs, outputs=outputs)
-        self.model.compile(optimizer=Adam(learning_rate=learning_rate), loss=loss)
+        self.compile(optimizer=Adam(learning_rate=learning_rate), loss=loss)

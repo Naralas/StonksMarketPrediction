@@ -82,7 +82,7 @@ class StocksDataWrapper:
             # X.shape = (X_a, X_b) -> (X_a, seq_len, X_b)
             X = build_sequences(X, seq_len=seq_len)
 
-        y = dataset[y_column].values
+        y = dataset[y_column].values[:X.shape[0]]
         
         return get_timeseries_splits(X, y, val_size=val_size, n_splits=n_splits)
 
