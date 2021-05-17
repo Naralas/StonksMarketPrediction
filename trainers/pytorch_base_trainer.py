@@ -1,6 +1,7 @@
 from trainers.base_trainer import BaseTrainer
 import wandb
 import torch
+import numpy as np
 
 
 class PytorchTrainer(BaseTrainer):
@@ -37,7 +38,7 @@ class PytorchTrainer(BaseTrainer):
                 # compute loss and other metrics, backprop
                 loss = loss_fn(output, target)
                 
-                batch_metrics = self.compute_metrics(output, target)
+                batch_metrics = self.compute_metrics(output.detach().cpu().numpy(), target.detach().cpu().numpy())
                 
                 # add these batch metrics to the epoch metrics
                 for k, v in batch_metrics.items():
@@ -64,36 +65,17 @@ class PytorchTrainer(BaseTrainer):
             predictions = []
             labels = []
 
-            # TODO : compute metrics with numpy / regular values and update in trainer function
-            for data, target in dataloader:
-                data = data.to(device)
-                output = model(data) # 
-                predictions.extend(prediction.cpu().numpy())
-                labels.extend(target.numpy())
-
-        return np.array(predictions), np.array(labels)
-    
-    def evaluate(self, dataloader):
-        model = self.model
-        model.eval()
-
-        with torch.no_grad():
-            metrics = {}
             for data, target in dataloader:
                 data = data.to(self.device)
-                output = model(data) # calling model calls forward function
-                
-                batch_metrics = self.compute_metrics(output, target)
+                output = model(data)  
+                predictions.extend(output.cpu().numpy())
+                labels.extend(target.numpy())
 
-                for k, v in batch_metrics.items():
-                    # if key does not exist set to empty list and append, if exists, append
-                    metrics.setdefault(k, []).append(v)
-
-
-            for metric, values in metrics.items():
-                metrics[metric] = sum(values) / len(values)
-
-            return metrics
+        return np.squeeze(np.array(predictions)), np.array(labels)
+    
+    def evaluate(self, dataloader):
+        predictions, labels = self.predict(dataloader)
+        return self.compute_metrics(predictions, labels)
 
 
     def compute_metrics(self, output, target):

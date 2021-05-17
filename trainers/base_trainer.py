@@ -11,3 +11,9 @@ class BaseTrainer(object):
     
     def train(self):
         raise NotImplementedError()
+
+    def predict(self):
+        raise NotImplementedError()
+
+    def evaluate(self):
+        raise NotImplementedError()

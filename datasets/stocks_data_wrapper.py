@@ -114,7 +114,6 @@ class StocksDataWrapper:
         df_columns = self.scaled_features
         target_columns = scaled_df.columns.values
 
-        # maybe only set zeros so we don't rescale everything
         temp_df = self.df.copy().loc[:, df_columns]
         temp_df[target_columns] = scaled_df
 

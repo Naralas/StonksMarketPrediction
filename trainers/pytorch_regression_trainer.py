@@ -8,9 +8,6 @@ class PytorchRegressionTrainer(PytorchTrainer):
 
     def compute_metrics(self, output, target):
         metrics_dict = {}
-        output = output.detach().cpu().numpy()
-        target = target.detach().cpu().numpy()
-
         metrics_dict['mse'] = mean_squared_error(target, output)
         metrics_dict['r2_score'] = r2_score(target, output)
         return metrics_dict
