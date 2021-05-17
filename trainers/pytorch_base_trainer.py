@@ -29,15 +29,14 @@ class PytorchTrainer(BaseTrainer):
             for data, target in dataloader:
                 # init the data and gradients
                 data = data.to(device)
-                target = target.to(device).unsqueeze(1)
+                target = target.to(device)
                 optimizer.zero_grad()
 
                 # make predictions
                 output = model(data)
 
                 # compute loss and other metrics, backprop
-                loss = loss_fn(output, target)
-                
+                loss = self.compute_loss(loss_fn, output, target)
                 batch_metrics = self.compute_metrics(output.detach().cpu().numpy(), target.detach().cpu().numpy())
                 
                 # add these batch metrics to the epoch metrics
@@ -57,6 +56,9 @@ class PytorchTrainer(BaseTrainer):
                 print(f"Metrics : {epoch_metrics}")
 
         wandb.finish()
+
+    def compute_loss(self, loss_fn, output, target):
+        return loss_fn(output, target)
 
     def predict(self, dataloader):
         model = self.model
