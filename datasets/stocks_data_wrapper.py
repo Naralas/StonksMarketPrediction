@@ -6,7 +6,7 @@ import ta
 
 from pathlib import Path
 from sklearn import preprocessing
-from DataHelper import *
+from helpers.data_helper import *
 
 
 default_features_list = ['Close', 'Volume', 'MACD_diff', 'RSI(14)', 'PercentageDiff', 'LowLen', 'RSI_diff']
@@ -74,7 +74,10 @@ class StocksDataWrapper:
 
         # replace the textual data (tendencies) by numerical values
         for col in dataset.columns:
-            dataset[col] = dataset[col].replace({'higher':1, 'stay':0, 'lower':-1})
+            if len(np.unique(dataset[y_column])) > 2:
+                dataset[col] = dataset[col].replace({'higher':2, 'stay':1, 'lower':0})
+            else:
+                dataset[col] = dataset[col].replace({'higher':1, 'lower':0})
 
         # remove the target column and build sequences if needed
         X = dataset.loc[:, dataset.columns != y_column].values
@@ -82,7 +85,7 @@ class StocksDataWrapper:
             # X.shape = (X_a, X_b) -> (X_a, seq_len, X_b)
             X = build_sequences(X, seq_len=seq_len)
 
-        y = dataset[y_column].values
+        y = dataset[y_column].values[:X.shape[0]]
         
         return get_timeseries_splits(X, y, val_size=val_size, n_splits=n_splits)
 
@@ -93,9 +96,13 @@ class StocksDataWrapper:
         
     def get_numerical_columns(self):
         return self.df.loc[:, self.get_numerical_columns()]
+    
+    def get_unscaled_values(self, values, base_name='Close'):
+        df = pd.DataFrame(data={base_name:values})
+        unscaled_df = self.get_unscaled_data(df)
+        return unscaled_df[base_name]
 
     def get_unscaled_data(self, df=None):
-        #print(self.scaled_features)
         if df is None:
             df = self.df.loc[:, self.scaled_features]
         if self.minmax_scaler is None:
@@ -110,7 +117,6 @@ class StocksDataWrapper:
         df_columns = self.scaled_features
         target_columns = scaled_df.columns.values
 
-        # maybe only set zeros so we don't rescale everything
         temp_df = self.df.copy().loc[:, df_columns]
         temp_df[target_columns] = scaled_df
 

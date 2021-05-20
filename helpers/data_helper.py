@@ -17,6 +17,9 @@ def build_sequences(data, seq_len=5):
 
 
 def get_timeseries_splits(X, y, val_size=0.3, n_splits=5):
+    if n_splits == 1:
+        return train_test_split(X,y, test_size=val_size, shuffle=False)
+
     tscv = TimeSeriesSplit(n_splits=n_splits)
 
     splits = []
@@ -38,19 +41,19 @@ def compute_GAP(close_series, open_series):
     gaps = list(map(lambda price_pair: price_pair[0] - price_pair[1], zip(shifted_close, open_series)))
     return np.abs(gaps)
 
-def compute_tendency(series, percentage=False, thresh_diff=None, labels=['lower', 'stay', 'higher']):
+def compute_tendency(price_series, percentage=False, thresh_diff=None, labels=['lower', 'stay', 'higher']):
     if percentage:
-        series = series.pct_change()
+        price_series = price_series.pct_change()
     if thresh_diff is not None:
         if len(labels) is not 3:
             raise Exception(f"If the threshold is specified, you have to specify 3 labels, given : {labels}")
         else:
-            return pd.cut(series,bins=[-math.inf, 0-thresh_diff, 0+thresh_diff, math.inf],labels=labels)
+            return pd.cut(price_series, bins=[-math.inf, 0-thresh_diff, 0+thresh_diff, math.inf],labels=labels)
     else:
         if len(labels) is not 2:
             raise Exception(f"If no threshold is specified, you have to provide 2 labels, given : {labels}")
         else:
-            return pd.cut(series,bins=[-math.inf, 0, math.inf],labels=labels)
+            return pd.cut(price_series, bins=[-math.inf, 0, math.inf],labels=labels)
 
 def trim_columns(df):
     column_names = []
