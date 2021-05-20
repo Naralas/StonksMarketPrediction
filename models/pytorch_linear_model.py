@@ -11,7 +11,6 @@ class LinearModel(nn.Module, BaseModel):
         self.optimizer = config['optimizer'](self.model.parameters(), lr=config['lr'])
         self.loss_fn = config['loss']()
 
-        
     def forward(self, x):
         out = self.model(x)
         return out

@@ -74,7 +74,10 @@ class StocksDataWrapper:
 
         # replace the textual data (tendencies) by numerical values
         for col in dataset.columns:
-            dataset[col] = dataset[col].replace({'higher':2, 'stay':1, 'lower':0})
+            if len(np.unique(dataset[y_column])) > 2:
+                dataset[col] = dataset[col].replace({'higher':2, 'stay':1, 'lower':0})
+            else:
+                dataset[col] = dataset[col].replace({'higher':1, 'lower':0})
 
         # remove the target column and build sequences if needed
         X = dataset.loc[:, dataset.columns != y_column].values

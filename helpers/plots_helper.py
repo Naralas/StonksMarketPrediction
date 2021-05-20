@@ -113,6 +113,7 @@ def plot_predictions(labels, predictions, title="Prices predictions and true val
 
     return ax
     
+    # TODO
     if log_wandb:
         wandb.log({"Unscaled prices and labels":wandb.Image(plt)})
         plt.close()

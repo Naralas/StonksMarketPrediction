@@ -48,12 +48,12 @@ def compute_tendency(price_series, percentage=False, thresh_diff=None, labels=['
         if len(labels) is not 3:
             raise Exception(f"If the threshold is specified, you have to specify 3 labels, given : {labels}")
         else:
-            return pd.cut(price_series,bins=[-math.inf, 0-thresh_diff, 0+thresh_diff, math.inf],labels=labels)
+            return pd.cut(price_series, bins=[-math.inf, 0-thresh_diff, 0+thresh_diff, math.inf],labels=labels)
     else:
         if len(labels) is not 2:
             raise Exception(f"If no threshold is specified, you have to provide 2 labels, given : {labels}")
         else:
-            return pd.cut(price_series,bins=[-math.inf, 0, math.inf],labels=labels)
+            return pd.cut(price_series, bins=[-math.inf, 0, math.inf],labels=labels)
 
 def trim_columns(df):
     column_names = []

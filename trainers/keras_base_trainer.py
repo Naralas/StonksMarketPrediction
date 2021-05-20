@@ -11,22 +11,21 @@ class KerasTrainer(BaseTrainer):
     def train(self, train_set, val_set=None):
         model = self.model
 
+        callbacks = []
         if self.use_wandb:
-            history = model.fit(train_set, validation_data=val_set, epochs=model.config['n_epochs'], 
-                    shuffle=False, verbose=self.verbose, callbacks=[WandbCallback()])
+            callbacks.append(WandbCallback())
 
-        else:
-            history = model.fit(train_set, validation_data=val_set, epochs=model.config['n_epochs'], 
-                    shuffle=False, verbose=self.verbose)
+        history = model.fit(train_set, validation_data=val_set, epochs=model.config['n_epochs'], 
+            shuffle=False, verbose=self.verbose, callbacks=callbacks)
         
-        output, target = self.predict(val_set)
-        metrics = self.compute_metrics(output, target)
-
-        if self.use_wandb:
-            wandb.log(metrics)
-            wandb.finish()
-        if self.verbose:
-            print(f"Metrics : {metrics}")
+        if val_set is not None:
+            output, target = self.predict(val_set)
+            metrics = self.compute_metrics(output, target)  
+            if self.use_wandb:
+                wandb.log(metrics)
+                wandb.finish()
+            if self.verbose:
+                print(f"Metrics : {metrics}")
 
         return metrics
 
@@ -35,6 +34,7 @@ class KerasTrainer(BaseTrainer):
         labels = np.array([])
 
         for x, y in dataset:
+            # TODO : check np array vs list
             predictions = np.concatenate([predictions, self.model.predict(x).flatten()])
             labels = np.concatenate([labels,y])
     

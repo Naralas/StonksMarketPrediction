@@ -9,7 +9,5 @@ class BaseModel(object):
         self.config = config
         self.model = None
 
-
     def build_model(self):
-        raise NotImplementedError
-
+        raise NotImplementedError()
