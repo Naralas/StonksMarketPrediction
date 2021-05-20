@@ -9,6 +9,10 @@ Swiss Joint Master of Science in Computer Science, March 2021 - September 2021
 
 The structure of the project and some of the files such as the base classes were inspired by this [github project](https://github.com/Ahmkel/Keras-Project-Template).
 
+## Goals
+
+The goal of this project is to work on financial markets, try and predict the changes and / or tendencies of the stock prices daily. We will compare the performances of the different models with the random market hypothesis.
+
 ## Project structure
 
 ```
@@ -17,58 +21,58 @@ The structure of the project and some of the files such as the base classes were
 ├───requirements.txt
 │   
 ├───data                 - data in csv-like format files
-│       AAL.txt
-│       AAPL.txt
-│       AMZN.txt
-│       GM.txt
-│       GOOG.txt
-│       IBM.txt
-│       JNJ.txt
-│       KO.txt
-│       TSLA.txt
-│       WMT.txt
-│       XOM.txt
+│   ├───AAL.txt
+│   ├───AAPL.txt
+│   ├───AMZN.txt
+│   ├───GM.txt
+│   ├───GOOG.txt
+│   ├───IBM.txt
+│   ├───JNJ.txt
+│   ├───KO.txt
+│   ├───TSLA.txt
+│   ├───WMT.txt
+│   └───XOM.txt
 │       
 ├───datasets                       - datasets files, for pytorch and wrapper with pandas dataframe
-│       stocks_data_wrapper.py     - wrapper with a pandas dataframe for stocks data, compute features, normalization, etc.
-│       torch_datasets.py
+│   ├───stocks_data_wrapper.py     - wrapper with a pandas dataframe for stocks data, compute features, normalization, etc.
+│   └───torch_datasets.py
 │       
 ├───helpers                        - general helper files : plots, preprocessing utils, etc.
-│       data_helper.py             - data-related functions compute some features, split data, etc.
-│       learning_utils.py
-│       plots_helper.py            - help plot the data and results with pyplot
-│       preprocessor.py
-│       __init__.py
+│   ├───data_helper.py             - data-related functions compute some features, split data, etc.
+│   ├───learning_utils.py
+│   ├───plots_helper.py            - help plot the data and results with pyplot
+│   ├───preprocessor.py
+│   └───__init__.py
 │       
 ├───models                         - model classes for pytorch and keras
-│       base_model.py              - abstract basic model by the different sub-models
-│       keras_lstm_model.py
-│       pytorch_linear_model.py
-│       __init__.py
+│   ├───base_model.py              - abstract basic model by the different sub-models
+│   ├───keras_lstm_model.py
+│   ├───pytorch_linear_model.py
+│   └───__init__.py
 │       
 ├───notebooks                      - jupyter notebooks with the different experiments
-│       FeaturesComparison.ipynb
-│       KerasLSTMClassification.ipynb
-│       KerasLSTMRegressionSplits.ipynb
-│       notebook_config.py
-│       PCA.ipynb
-│       Pytorch_LinearModel_Prediction.ipynb
-│       Pytorch_LinearModel_Regression.ipynb
-│       Pytorch_LSTMModel_StockPrediction.ipynb
-│       RandomWalk.ipynb
-│       StockPriceRegressionModel.ipynb
-│       StockPriceTendencyPrediction.ipynb
-│       __init__.py
+│   ├───FeaturesComparison.ipynb
+│   ├───KerasLSTMClassification.ipynb
+│   ├───KerasLSTMRegressionSplits.ipynb
+│   ├───notebook_config.py
+│   ├───PCA.ipynb
+│   ├───Pytorch_LinearModel_Prediction.ipynb
+│   ├───Pytorch_LinearModel_Regression.ipynb
+│   ├───Pytorch_LSTMModel_StockPrediction.ipynb
+│   ├───RandomWalk.ipynb
+│   ├───StockPriceRegressionModel.ipynb
+│   ├───StockPriceTendencyPrediction.ipynb
+│   └───__init__.py
 │       
 └───trainers            - trainer files which handle the models training and predictions for pytorch and keras
-        base_trainer.py - base trainer class which is inherited by all sub-trainers for the different frameworks
-        keras_base_trainer.py      
-        keras_classification_trainer.py
-        keras_regression_trainer.py
-        pytorch_base_trainer.py
-        pytorch_classification_trainer.py
-        pytorch_regression_trainer.py
-        __init__.py
+    ├───base_trainer.py - base trainer class which is inherited by all sub-trainers for the different frameworks
+    ├───keras_base_trainer.py      
+    ├───keras_classification_trainer.py
+    ├───keras_regression_trainer.py
+    ├───pytorch_base_trainer.py
+    ├───pytorch_classification_trainer.py
+    ├───pytorch_regression_trainer.py
+    └───__init__.py
 
 ```
 
