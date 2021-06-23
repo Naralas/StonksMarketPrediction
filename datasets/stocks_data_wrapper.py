@@ -1,3 +1,7 @@
+"""
+
+"""
+
 import pandas as pd
 import re
 import numpy as np
@@ -13,6 +17,20 @@ default_features_list = ['Close', 'Volume', 'MACD_diff', 'RSI(14)', 'PercentageD
 
 
 class StocksDataWrapper:
+    """This class is a wrapper for stocks market data using pandas dataframes
+    The dataframe object is accessible using the attribute 'df'
+
+    Attributes
+    -----------
+    df : pd.DataFrame
+        pandas dataframe containg the data
+    minmax_scaler : sklearn.preprocessing.MinMaxScaler
+        scaler object used for normalizing the features
+    scaled_features : list[str]
+        list of features names that were normalized
+    feature_names : list[str]
+        list of all computed feature names
+    """
     def __init__(self, df):
         self.df = df
 
@@ -26,6 +44,14 @@ class StocksDataWrapper:
         return len(self.df)
 
     def head(self, n=5):
+        """Wrapper for the pandas dataframe's head method
+
+        Args:
+            n (int, optional): Number of rows to return. Defaults to 5.
+
+        Returns:
+            n dataframe rows : same as doing pandas.DataFrame.head(n)
+        """
         return self.df.head(n)
 
     def get_df(self):
@@ -35,8 +61,13 @@ class StocksDataWrapper:
         self.df = merge_datasets(self.df, other)
 
     def replace_pct_change(self, features_list):
+        """Replace a list of features by their return percentage.
+
+        Args:
+            features_list (list[str]): list of features names that should be replaced by their percentage change
+        """
         for col in features_list:
-            df[col] = df[col].pct_change()
+            self.df[col] = self.df[col].pct_change()
 
 
     def normalize_data(self, features_list=[], scale=(0,1), inplace=True):
@@ -172,6 +203,7 @@ class StocksDataWrapper:
             self.df['Tendency'] = compute_tendency(self.df[price_column], percentage=True, thresh_diff=thresh_diff, labels=['lower','stay', 'higher'])
         
         self.df['NextPrice'] = self.df[price_column].shift(periods=-predict_n)
+        self.df['NextPriceChange'] = self.df['NextPrice'].pct_change(periods=predict_n)
         self.df['Next'] = self.df['Tendency'].shift(periods=-predict_n)
 
 
