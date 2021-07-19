@@ -7,7 +7,7 @@ import matplotlib.ticker as mtick
 import pandas as pd
 from sklearn.metrics import plot_confusion_matrix, confusion_matrix, roc_curve, auc
 
-def plot_prices(date_series, price_series, quotation_name = "", ma_values = [], log_scale=False):
+def plot_prices(date_series, price_series, quotation_name = "", ma_values = [], ema_values=[], log_scale=False):
     x_values = [datetime.datetime.strptime(d,"%Y-%m-%d").date() for d in date_series]
     ax = plt.gca()
     if log_scale:
@@ -21,7 +21,10 @@ def plot_prices(date_series, price_series, quotation_name = "", ma_values = [], 
     ax.plot(x_values, price_series, label="Stock price")
 
     for val in ma_values:
-        ax.plot(x_values, price_series.rolling(val).mean(), label=f"MA({val})")
+        ax.plot(x_values, price_series.rolling(val).mean(), label=f"SMA({val})")
+
+    for val in ema_values:
+        ax.plot(x_values, price_series.ewm(span=val, adjust=False).mean(), label=f"EMA({val})")
 
     ax.legend(loc='best')
 
