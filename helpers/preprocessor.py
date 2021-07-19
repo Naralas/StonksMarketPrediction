@@ -3,8 +3,8 @@ import os
 
 
 def main():
-    file_path = './data/IBM.csv'
-    write_path ='./data/IBM.txt'
+    file_path = './data/PEP.csv'
+    write_path ='./data/PEP.txt'
     file_name = os.path.basename(file_path)
     stock_name = os.path.splitext(file_name)[0]
 
