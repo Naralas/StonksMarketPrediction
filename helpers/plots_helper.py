@@ -82,7 +82,11 @@ def plot_normalized_histogram(series, log_scale=False):
     if log_scale:
         ax.set(yscale='log')
     ax.set_title(f"Normalized histogram of series \"{series.name}\"")
-    ax.hist(series, weights = np.ones_like(series) / len(series))
+    #ax.hist(series, weights = np.ones_like(series) / len(series))
+    labels, counts = np.unique(series, return_counts=True)
+    counts = [val / sum(counts) for val in counts] 
+    ax.bar(labels, counts, align='center')
+    ax.set_xticks(labels)
     return ax
 
 def plot_cfm(clf, X_test, Y_test, normalize='true'):

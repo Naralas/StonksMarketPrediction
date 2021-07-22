@@ -43,7 +43,9 @@ def compute_GAP(close_series, open_series):
 
 def compute_tendency(price_series, percentage=False, thresh_diff=None, labels=['lower', 'stay', 'higher']):
     if percentage:
+        #print(price_series)
         price_series = price_series.pct_change()
+        #print(price_series)
     if thresh_diff is not None:
         if len(labels) is not 3:
             raise Exception(f"If the threshold is specified, you have to specify 3 labels, given : {labels}")

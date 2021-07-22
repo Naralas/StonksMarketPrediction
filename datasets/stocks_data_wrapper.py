@@ -131,8 +131,8 @@ class StocksDataWrapper:
         self.df['LowLen'] = self.df.apply(lambda r: np.minimum(r['Open'], r[price_column]) - r['Low'], axis=1)
         self.df['RSI(14)'] = ta.momentum.RSIIndicator(self.df[price_column], window=14).rsi()
         self.df['GAP'] = compute_GAP(self.df[price_column], self.df['Open'])
-        self.df['RSI_diff'] = self.df['RSI(14)'].diff(periods=predict_n)
-        self.df['Volume_diff'] = self.df['Volume'].diff(periods=predict_n)
+        self.df['RSI_diff'] = self.df['RSI(14)'].diff(periods=1)
+        self.df['Volume_diff'] = self.df['Volume'].diff(periods=1)
 
 
         macd = ta.trend.MACD(self.df[price_column])
@@ -160,11 +160,11 @@ class StocksDataWrapper:
         
         ema = ta.trend.EMAIndicator(self.df[price_column], window=14).ema_indicator()
         self.df['EMA(14)'] = ema
-        self.df['EMA_Diff'] = ema.diff(periods=predict_n)
+        self.df['EMA_Diff'] = ema.diff(periods=1)
         self.df['SMA(20) - SMA(10)'] = sma_20 - sma_10
 
-        self.df['Difference'] = self.df[price_column].diff(periods=predict_n)
-        self.df['PercentageDiff'] = self.df[price_column].pct_change(periods=predict_n) 
+        self.df['Difference'] = self.df[price_column].diff(periods=1)
+        self.df['PercentageDiff'] = self.df[price_column].pct_change(periods=1) 
 
         if thresh_diff is None:
             self.df['Tendency'] = compute_tendency(self.df[price_column], percentage=True, labels=['lower', 'higher'])
@@ -210,7 +210,7 @@ class StocksDataWrapper:
         files = files.rglob(files_pattern) if recursive else files.glob(files_pattern)
 
         datasets_dict = {
-            cls.read_from(file, compute_features=compute_features, predict_n=predict_n, normalize=normalize):file.name 
+            file.name:cls.read_from(file, compute_features=compute_features, predict_n=predict_n, normalize=normalize)
             for file in files
         }
 
