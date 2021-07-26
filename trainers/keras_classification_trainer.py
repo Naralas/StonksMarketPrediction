@@ -18,20 +18,20 @@ class KerasClassificationTrainer(KerasTrainer):
         # take the argmax (index of max {0;1;2} or {0;1} for binary classification)
         output = np.argmax(output, axis=1)
 
-        metrics_dict['accuracy'] = accuracy_score(target, output)
+        metrics_dict['acc'] = accuracy_score(target, output)
 
         class_labels = ['higher', 'stay', 'lower']
 
         # if binary classification problem
-        if len(np.unique(target)) == 2:
+        """if len(np.unique(target)) == 2:
             fpr, tpr, thresholds = roc_curve(target, output)
             metrics_dict['roc_auc'] = auc(fpr, tpr)
-            class_labels = ['higher', 'lower']
+            class_labels = ['higher', 'lower']"""
 
-        metrics_dict['f1_score'] = f1_score(target, output, average='weighted')
+        metrics_dict['f1'] = f1_score(target, output, average='weighted')
 
-        ax = plot_heatmap(labels=target, predictions=output, class_labels=class_labels)
-        metrics_dict['confusion_matrix'] = wandb.Image(plt)
+        """ax = plot_heatmap(labels=target, predictions=output, class_labels=class_labels)
+        metrics_dict['confusion_matrix'] = wandb.Image(plt)"""
         plt.close()
 
         return metrics_dict

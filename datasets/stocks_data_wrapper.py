@@ -66,16 +66,23 @@ class StocksDataWrapper:
     
     
     def get_datasets(self, n_splits=5, val_size=0.3, sequences=False, seq_len=5, y_column='NextPrice',
+                        negative_labels=False,
                         features_list=default_features_list):
 
         dataset = self.df.copy()
+
         # filter only the features columns in the data and the target column
-        dataset = dataset.loc[:, features_list + [y_column]]
+        features_list = features_list + [y_column] if y_column not in features_list else features_list
+
+        dataset = dataset.loc[:, features_list]
 
         # replace the textual data (tendencies) by numerical values
         for col in dataset.columns:
             if len(np.unique(dataset[y_column])) > 2:
-                dataset[col] = dataset[col].replace({'higher':2, 'stay':1, 'lower':0})
+                if negative_labels:
+                    dataset[col] = dataset[col].replace({'higher':1, 'stay':0, 'lower':-1})
+                else:
+                    dataset[col] = dataset[col].replace({'higher':2, 'stay':1, 'lower':0})
             else:
                 dataset[col] = dataset[col].replace({'higher':1, 'lower':0})
 

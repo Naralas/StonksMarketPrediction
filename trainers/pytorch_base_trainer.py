@@ -17,7 +17,7 @@ class PytorchTrainer(BaseTrainer):
         loss_fn = self.model.loss_fn
 
         
-        model.train()
+
         if debug:
             torch.autograd.set_detect_anomaly(True)
 
@@ -27,6 +27,7 @@ class PytorchTrainer(BaseTrainer):
         for epoch in range(model.config['n_epochs']):
             epoch_metrics = {}
             for data, target in dataloader:
+                model.train()
                 # init the data and gradients
                 data = data.to(device)
                 target = target.to(device)

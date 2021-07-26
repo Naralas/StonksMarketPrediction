@@ -8,6 +8,7 @@ class LinearModel(nn.Module, BaseModel):
 
         self.build_model(input_dim, output_dim, device)
         self.device = device
+        self.config['output_dim'] = output_dim
         self.optimizer = config['optimizer'](self.model.parameters(), lr=config['lr'])
         self.loss_fn = config['loss']()
 

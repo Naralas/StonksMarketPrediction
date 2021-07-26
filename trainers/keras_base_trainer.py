@@ -18,6 +18,8 @@ class KerasTrainer(BaseTrainer):
         history = model.fit(train_set, validation_data=val_set, epochs=model.config['n_epochs'], 
             shuffle=False, verbose=self.verbose, callbacks=callbacks)
         
+        metrics = {}
+        
         if val_set is not None:
             output, target = self.predict(val_set)
             metrics = self.compute_metrics(output, target)  

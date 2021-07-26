@@ -14,14 +14,15 @@ class PytorchClassificationTrainer(PytorchTrainer):
         metrics_dict = {}
         # take the class with the highest score
         output = output.argmax(1)
-        metrics_dict['accuracy'] = np.sum(output==target) / len(target)
+        metrics_dict['acc'] = np.sum(output==target) / len(target)
 
         # if binary classification problem
-        if len(np.unique(target)) == 2:
+        if self.model.config['output_dim'] == 2:
             fpr, tpr, thresholds = roc_curve(target, output)
             metrics_dict['roc_auc'] = auc(fpr, tpr)
 
-        metrics_dict['f1_score'] = f1_score(target, output, average='weighted')
+
+        metrics_dict['f1'] = f1_score(target, output, average='weighted')
 
         return metrics_dict
 
