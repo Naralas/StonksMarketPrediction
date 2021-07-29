@@ -116,10 +116,7 @@ class StocksDataWrapper:
             raise Exception("Trying to rescale data without prior normalization")
 
         return self.__inverse_transform_columns__(df)
-        return pd.DataFrame(data=self.minmax_scaler.inverse_transform(
-                                    df.loc[:, features_list]),
-                                columns=features_list)
-
+        
     def __inverse_transform_columns__(self, scaled_df):        
         df_columns = self.scaled_features
         target_columns = scaled_df.columns.values

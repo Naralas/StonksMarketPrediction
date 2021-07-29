@@ -77,6 +77,7 @@ def plot_losses(history, title):
 
     return ax
 
+
 def plot_normalized_histogram(series, log_scale=False):
     ax = plt.gca()
     if log_scale:

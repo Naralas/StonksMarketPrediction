@@ -3,6 +3,7 @@ import re
 import numpy as np
 import math
 import ta
+import json
 
 from pathlib import Path
 from itertools import tee, islice
@@ -10,6 +11,23 @@ from sklearn import preprocessing
 
 from sklearn.model_selection import TimeSeriesSplit, train_test_split
 
+
+def save_dict(dict_save, path):
+    with open(path, 'w') as f:
+        json.dump(dict_save, f)
+
+def read_dict(path):
+    with open(path, 'r') as f:
+        read_dict = json.load(f)
+
+    return read_dict
+
+def merge_metric_dicts(dict_1, dict_2):
+    for predict_n, quot_metrics in dict_1.items():
+        for quot, clf_metrics in quot_metrics.items():
+            # merge dictionaries
+            clf_metrics = {**clf_metrics, **dict_2[predict_n][quot]}
+            dict_1[predict_n][quot] = clf_metrics
 
 def build_sequences(data, seq_len=5):
     n_sequences = len(data) - seq_len
