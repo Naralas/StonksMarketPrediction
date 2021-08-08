@@ -36,7 +36,6 @@ class KerasTrainer(BaseTrainer):
         labels = np.array([])
 
         for x, y in dataset:
-            # TODO : check np array vs list
             predictions = np.concatenate([predictions, self.model.predict(x).flatten()])
             labels = np.concatenate([labels,y])
     

@@ -8,9 +8,25 @@ import json
 from pathlib import Path
 from itertools import tee, islice
 from sklearn import preprocessing
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from sklearn.model_selection import TimeSeriesSplit, train_test_split
 
+def save_predictions_heatmaps(path, metrics_dict, metrics_names_list, reversed=False):
+    for predict_n, quot_metrics in metrics_dict.items():
+        metrics_df = pd.DataFrame.from_dict(quot_metrics).T
+    
+        for metric in metrics_names_list:
+            filtered_df = metrics_df.applymap(lambda metrics: metrics[metric])
+            filtered_df = filtered_df.round(4)
+            plt.figure()
+            if reversed:
+                heatmap = sns.heatmap(filtered_df, cmap ='mako_r', linewidths = 0.5, annot = True)
+            else:
+                heatmap = sns.heatmap(filtered_df, cmap ='mako', linewidths = 0.5, annot = True)
+            heatmap.figure.savefig(fr"{path}{predict_n}_{metric}.png")
+            plt.close()
 
 def save_dict(dict_save, path):
     with open(path, 'w') as f:

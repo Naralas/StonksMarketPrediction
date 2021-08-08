@@ -76,6 +76,7 @@ class StocksDataWrapper:
 
         dataset = dataset.loc[:, features_list]
 
+
         # replace the textual data (tendencies) by numerical values
         for col in dataset.columns:
             if len(np.unique(dataset[y_column])) > 2:
@@ -198,12 +199,14 @@ class StocksDataWrapper:
         if trim_column_names:
             trim_columns(df)
 
+        df = df[:-752]
         dataset = cls(df)
         if compute_features: 
             dataset.compute_features(predict_n=predict_n, thresh_diff=thresh_diff) 
         if normalize:
             dataset.normalize_data()
 
+        
         return dataset
 
     @classmethod

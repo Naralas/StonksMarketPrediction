@@ -121,14 +121,6 @@ def plot_predictions(labels, predictions, title="Prices predictions and true val
 
     return ax
     
-    # TODO
-    if log_wandb:
-        wandb.log({"Unscaled prices and labels":wandb.Image(plt)})
-        plt.close()
-    else:
-        plt.show()
-        
-
 
 def plot_heatmap(labels, predictions, class_labels, normalize='all'):
     cf_matrix = confusion_matrix(y_true=labels, y_pred=predictions, normalize=normalize)

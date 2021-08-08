@@ -9,6 +9,8 @@ Swiss Joint Master of Science in Computer Science, March 2021 - September 2021
 
 The structure of the project and some of the files such as the base classes were inspired by this [github project](https://github.com/Ahmkel/Keras-Project-Template).
 
+[Stonks ?](https://knowyourmeme.com/memes/stonks)
+
 ## Goals
 
 The goal of this project is to work on financial markets, try and predict the changes and / or tendencies of the stock prices daily. We will compare the performances of the different models with the random market hypothesis.
@@ -83,5 +85,6 @@ Clone the repo wherever you want, then create a virtual environment and install 
 - `python3 -m venv <path/to/virtualenv>`
 - Depending on your OS : `source <path/to/virtualenv>/bin/activate` for Unix or `<path\to\virtualenv\activate.bat>` for Windows
 - `pip install -r requirements.txt`
+- `jupyter lab`
 
 You will now be able to run the experiments in the `/notebooks/` folder.
