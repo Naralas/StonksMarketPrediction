@@ -26,11 +26,14 @@ The goal of this project is to work on financial markets, try and predict the ch
 │   ├───AAL.txt
 │   ├───AAPL.txt
 │   ├───AMZN.txt
+│   ├───CMCSA.txt
+│   ├───COST.txt
 │   ├───GM.txt
 │   ├───GOOG.txt
 │   ├───IBM.txt
 │   ├───JNJ.txt
 │   ├───KO.txt
+│   ├───PEP.txt
 │   ├───TSLA.txt
 │   ├───WMT.txt
 │   └───XOM.txt
@@ -56,7 +59,14 @@ The goal of this project is to work on financial markets, try and predict the ch
 │   ├───FeaturesComparison.ipynb
 │   ├───KerasLSTMClassification.ipynb
 │   ├───KerasLSTMRegressionSplits.ipynb
-│   ├───notebook_config.py
+│   ├───notebook_config.py      - helper for notebooks settings (path)
+│   ├───pipelines               - pipelines to run on all stocks
+│       ├───notebook_config.py
+│       ├───Pipeline_KerasLSTM.ipynb
+│       ├───Pipeline_ML_Classification.ipynb
+│       ├───Pipeline_ML_Regression.ipynb
+│       ├───Pipeline_Pytorch_LinearModel_Prediction.ipynb
+│       ├───Pipeline_RandomWalk.ipynb
 │   ├───PCA.ipynb
 │   ├───Pytorch_LinearModel_Prediction.ipynb
 │   ├───Pytorch_LinearModel_Regression.ipynb
