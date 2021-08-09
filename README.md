@@ -67,6 +67,8 @@ The goal of this project is to work on financial markets, try and predict the ch
 │       ├───Pipeline_ML_Regression.ipynb
 │       ├───Pipeline_Pytorch_LinearModel_Prediction.ipynb
 │       ├───Pipeline_RandomWalk.ipynb
+│       ├───results                 - results output folder
+│           └───...
 │   ├───PCA.ipynb
 │   ├───Pytorch_LinearModel_Prediction.ipynb
 │   ├───Pytorch_LinearModel_Regression.ipynb
