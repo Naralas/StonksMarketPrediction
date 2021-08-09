@@ -13,7 +13,7 @@ The structure of the project and some of the files such as the base classes were
 
 ## Goals
 
-The goal of this project is to work on financial markets, try and predict the changes and / or tendencies of the stock prices daily. We will compare the performances of the different models with the random market hypothesis.
+The goal of this project is to work on financial markets, try and predict the changes and / or tendencies of the stock prices daily. We will compare the performances of the different models with the efficient market hypothesis by building a model predicting the trends and prices according to a random walk process.
 
 ## Project structure
 
