@@ -44,6 +44,7 @@ The goal of this project is to work on financial markets, try and predict the ch
 │       
 ├───helpers                        - general helper files : plots, preprocessing utils, etc.
 │   ├───data_helper.py             - data-related functions compute some features, split data, etc.
+│   ├───preprocessor.py            - LIME model explainer helper    
 │   ├───learning_utils.py
 │   ├───plots_helper.py            - help plot the data and results with pyplot
 │   ├───preprocessor.py
@@ -59,14 +60,14 @@ The goal of this project is to work on financial markets, try and predict the ch
 │   ├───FeaturesComparison.ipynb
 │   ├───KerasLSTMClassification.ipynb
 │   ├───KerasLSTMRegressionSplits.ipynb
-│   ├───notebook_config.py      - helper for notebooks settings (path)
-│   ├───pipelines               - pipelines to run on all stocks
+│   ├───notebook_config.py          - helper for notebooks settings (path)
+│   ├───pipelines                   - pipelines to run experiments on all stocks
 │       ├───notebook_config.py
 │       ├───Pipeline_KerasLSTM.ipynb
 │       ├───Pipeline_ML_Classification.ipynb
 │       ├───Pipeline_ML_Regression.ipynb
 │       ├───Pipeline_Pytorch_LinearModel_Prediction.ipynb
-│       ├───Pipeline_RandomWalk.ipynb
+│       └───Pipeline_RandomWalk.ipynb
 │   ├───PCA.ipynb
 │   ├───Pytorch_LinearModel_Prediction.ipynb
 │   ├───Pytorch_LinearModel_Regression.ipynb

@@ -1,6 +1,7 @@
 from trainers.pytorch_base_trainer import PytorchTrainer
 import torch
 import numpy as np
+import torch.nn as nn
 from sklearn.metrics import roc_curve, auc, f1_score
 
 class PytorchClassificationTrainer(PytorchTrainer):
@@ -26,4 +27,21 @@ class PytorchClassificationTrainer(PytorchTrainer):
 
         return metrics_dict
 
-  
+    def predict(self, dataloader):
+        # add probability output with softmax to output array with sum to 1 for the classes
+        probability_model = nn.Sequential(
+            *self.model.model,
+            nn.Softmax(1),
+        )
+        self.model.eval()
+        with torch.no_grad():
+            predictions = []
+            labels = []
+
+            for data, target in dataloader:
+                data = data.to(self.device)
+                output = probability_model(data)  
+                predictions.extend(output.cpu().numpy())
+                labels.extend(target.numpy())
+
+        return np.squeeze(np.array(predictions)), np.array(labels)

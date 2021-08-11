@@ -199,7 +199,7 @@ class StocksDataWrapper:
         if trim_column_names:
             trim_columns(df)
 
-        df = df[:-752]
+    
         dataset = cls(df)
         if compute_features: 
             dataset.compute_features(predict_n=predict_n, thresh_diff=thresh_diff) 

@@ -15,7 +15,6 @@ class StocksDataset(Dataset):
     def __len__(self):
         return len(self.data)
     
-# TODO : remove
 class StocksSeqDataset(StocksDataset):
     def __init__(self, data, target):
         self.data = torch.Tensor(data)
