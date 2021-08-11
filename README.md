@@ -56,7 +56,7 @@ The goal of this project is to work on financial markets, try and predict the ch
 │   ├───pytorch_linear_model.py
 │   └───__init__.py
 │       
-├───notebooks                      - jupyter notebooks with the different experiments
+├───notebooks                       - jupyter notebooks with the different experiments
 │   ├───FeaturesComparison.ipynb
 │   ├───KerasLSTMClassification.ipynb
 │   ├───KerasLSTMRegressionSplits.ipynb
@@ -77,8 +77,8 @@ The goal of this project is to work on financial markets, try and predict the ch
 │   ├───StockPriceTendencyPrediction.ipynb
 │   └───__init__.py
 │       
-└───trainers            - trainer files which handle the models training and predictions for pytorch and keras
-    ├───base_trainer.py - base trainer class which is inherited by all sub-trainers for the different frameworks
+└───trainers                - trainer files which handle the models training and predictions for pytorch and keras
+    ├───base_trainer.py     - base trainer class which is inherited by all sub-trainers for the different frameworks
     ├───keras_base_trainer.py      
     ├───keras_classification_trainer.py
     ├───keras_regression_trainer.py
