@@ -1,7 +1,5 @@
 import pandas as pd
-import re
 import numpy as np
-import math
 import ta
 
 from pathlib import Path
@@ -13,6 +11,36 @@ default_features_list = ['Close', 'Volume', 'MACD_diff', 'RSI(14)', 'PercentageD
 
 
 class StocksDataWrapper:
+    """Pandas DataFrame wrapper for stocks data
+    all columns of the dataframe can be accessed with the array notation for example : data_wrapper['Close']
+
+    This class contains functions for reading from data files in CSV format, compute features, 
+    normalize/de-normalize and build machine-learning ready datasets.
+
+    The usual pipeline for getting data is the following set of functions :
+
+    For a single stock :
+    *StocksDataWrapper.read_from(path:str, [delimiter:char], [predict_n:int], [trim_column_names:boolean]
+                                [compute_features:boolean], [thresh_diff:float], [normalize:boolean]) - class function, read data and build object 
+                                                                                                        returns a StocksDataWrapper object
+    
+    Or for reading all in a folder :
+    *StocksDataWrapper.import_folder(cls, path:str, [files_pattern:str], [recursive:boolean],
+                                [compute_features:boolean], [thresh_diff:float], [normalize:boolean]) - class function, 
+                                                                                                        returns a dict [file_name:StocksDataWrapper]
+    If not done previously at the reading step :
+    *compute_features([price_column:str], [predict_n=int], [thresh_diff:float])                       - add technical indicators features and trends
+                                                                                                        returns the list of features as a list [str]
+    For normalizing, if not done previously :
+    *normalize_data([features_list:list], [scale:tuple(float,float)], [inplace:boolean])              - normalization, if no features given by default will normalize all numerical columns
+
+    *get_datasets([n_splits:int], [val_size:float], [sequences:boolean], [seq_len:int],               - build datasets, can be done in sequences (eg for LSTM)
+                                [y_column:str], [negative_labels:boolean],                              negative labels : some DL frameworks do not accept -1 as label, start at 0 for lower
+                                [features_list:list[str]])                                              returns a numpy array of tuple of datasets splits (in timeseries manner) :
+                                                                                                        (X_train, X_val, X_test, y_train, y_val, y_test) or without val objects if val_size is 0.0
+
+    There are other functions available such as de-normalization, merging datasets, etc.
+    """
     def __init__(self, df):
         self.df = df
 
@@ -36,10 +64,20 @@ class StocksDataWrapper:
 
     def replace_pct_change(self, features_list):
         for col in features_list:
-            df[col] = df[col].pct_change()
+            self.df[col] = self.df[col].pct_change()
 
 
     def normalize_data(self, features_list=[], scale=(0,1), inplace=True):
+        """Normalize the columns passed to the given scale.
+
+        Args:
+            features_list (list, optional): Features list to normalize. Defaults to [] -> will use default features list
+            scale (tuple, optional): Normalization values scale. Defaults to (0,1).
+            inplace (bool, optional): Replace the values in the object's dataframe or not. Defaults to True.
+
+        Returns:
+            Pandas.DataFrame: normalized dataframe if inplace is set to False 
+        """
         self.raw_df = self.df.copy()
 
 
@@ -68,6 +106,22 @@ class StocksDataWrapper:
     def get_datasets(self, n_splits=5, val_size=0.3, sequences=False, seq_len=5, y_column='NextPrice',
                         negative_labels=False,
                         features_list=default_features_list):
+        """Build machine learning-ready datasets, with timeseries cross-validation if n_splits > 1
+
+        Args:
+            n_splits (int, optional): Number of time series split. Defaults to 5.
+            val_size (float, optional): Size of validation sets, can be set to 0 for no sets. Defaults to 0.3.
+            sequences (bool, optional): Build data as sequences : [[Feature_A_t-1, ...][Feature_A_t-2, ...], ...]. Can be used for LSTM. Defaults to False.
+            seq_len (int, optional): Size of sequences. Defaults to 5.
+            y_column (str, optional): Target column for ML datasets. Defaults to 'NextPrice'.
+            negative_labels (bool, optional): Set to start labels at -1 or 0, as some DL frameworks don't accept negative values. Defaults to False.
+            features_list ([type], optional): List of features to include in the training data. Defaults to default_features_list.
+
+        Returns:
+            numpy.array: Numpy array of the splits of datasets. Each element of the array is a tuple in the following format :
+            (X_train, X_val, X_test, y_train, y_val, y_test) if val_size > 0.0
+            (X_train, X_test, y_train, y_test) otherwise
+        """
 
         dataset = self.df.copy()
 
@@ -131,6 +185,16 @@ class StocksDataWrapper:
         
 
     def compute_features(self, price_column='Close',predict_n=1, thresh_diff=None):
+        """Compute a list of technical indicators and trends of the prices and volumes history of the stock
+
+        Args:
+            price_column (str, optional): Column name that will be used as the main price. Defaults to 'Close'.
+            predict_n (int, optional): Number of periods difference that will be predicted and used for target columns. Defaults to 1.
+            thresh_diff ([type], optional): Threshold of price difference that will be used for the stationary class . Defaults to None -> no stationary class.
+
+        Returns:
+            list[str]: list of feature columns that were included 
+        """
         base_feature_names = self.df.columns.values
 
         self.df['LowLen'] = self.df.apply(lambda r: np.minimum(r['Open'], r[price_column]) - r['Low'], axis=1)
@@ -193,6 +257,20 @@ class StocksDataWrapper:
 
     @classmethod
     def read_from(cls, file_path, delimiter=' ', trim_column_names=True, compute_features=False, predict_n=1, thresh_diff=None, normalize=False):
+        """Read stock data from a given file. Can compute features and normalize already.
+
+        Args:
+            file_path ([type]): Path to the file that will contain data in CSV format
+            delimiter (str, optional): Values delimiter of the CSV file. Defaults to ' '.
+            trim_column_names (bool, optional): Will remove prefix in the column names, e.g. AAPL.Close -> Close. Defaults to True.
+            compute_features (bool, optional): Return data wrapper with already computed features. Defaults to False.
+            predict_n (int, optional): N days prediction, used for features computation. Defaults to 1.
+            thresh_diff ([type], optional): Price difference threshold for stationary class, used for features computation. Defaults to None.
+            normalize (bool, optional): Normalize the values. Defaults to False.
+
+        Returns:
+            StocksDataWrapper: Stocks data wrapper object with inner pandas dataframe containing the data
+        """
         df = pd.read_csv(file_path, delimiter=delimiter)
         # set the index to start at 0 in case it is at 1 in the data
         df.index = np.arange(0, len(df))
@@ -212,6 +290,19 @@ class StocksDataWrapper:
     @classmethod
     def import_folder(cls, folder_path, files_pattern='*.txt', recursive=False,
              compute_features=False, predict_n=1, normalize=False):
+        """Helper method to read all data from a directory
+
+        Args:
+            folder_path ([type]): Path to folder containing data
+            files_pattern (str, optional): Matching pattern of the files that will be read. Defaults to '*.txt'.
+            recursive (bool, optional): Recursively search for stocks files. Defaults to False.
+            compute_features (bool, optional): Return data wrappers with features already computed. Defaults to False.
+            predict_n (int, optional): N days predictions, used for features computation. Defaults to 1.
+            normalize (bool, optional): Normalization. Defaults to False.
+
+        Returns:
+            dictionary(file_name:StocksDataWrapper): Dictionary of read files with keys being the file's name and values the matching StocksDataWrapper object 
+        """
 
         files = Path(folder_path)
         files = files.rglob(files_pattern) if recursive else files.glob(files_pattern)
@@ -235,15 +326,11 @@ if __name__ == '__main__':
     dataset['Tendency'] = compute_tendency(dataset['Close'].pct_change(), labels=['lower', 'higher'])
     dataset['RSI(14)'] =  ta.momentum.RSIIndicator(dataset['Close'], window=14).rsi()
     dataset['GAP'] = compute_GAP(dataset['Close'], dataset['Open'])
-    #print(dataset.head())
     dataset.normalize_data(features_list=['Open', 'Close', 'Volume'])
-    #print(dataset.get_unscaled_data())
 
 
     dataset = StocksDataWrapper.read_from('./data/AAPL.txt')
     dataset.compute_features(predict_n=5)
     splits = dataset.get_datasets(sequences=True)
     print(splits)
-    
-    #print(f"Final dataset :\r\n ", dataset.head(20))
 
