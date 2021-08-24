@@ -3,31 +3,40 @@ import pandas as pd
 import torch
 
 class StocksDataset(Dataset):
+    """Pytorch dataset class for stocks.
+
+    Args:
+        Dataset (Pytorch Dataset): Pytorch Dataset object
+    """
     def __init__(self, data, target):
+        """Init function of the dataset. Will transform data and target to Pytorch Tensors.
+
+        Args:
+            data (Numpy Array): Numpy array of samples features (X).
+            target (Numpy Array): Numpy array of targets (y).
+        """
         self.data = torch.Tensor(data)
         self.target = torch.Tensor(target)
         
     def __getitem__(self, index):
+        """Get item at specific position (array access).
+
+        Args:
+            index (int): Index.
+
+        Returns:
+            Tuple(Pytorch tensor, Pytorch tensor): Tuple of pytorch tensors of sample features and target.
+        """
         datapoint = self.data[index]
         target = self.target[index]
         return datapoint, target
         
     def __len__(self):
+        """Returns the length of the dataset 
+
+        Returns:
+            Int: Length of the dataset.
+        """
         return len(self.data)
     
-class StocksSeqDataset(StocksDataset):
-    def __init__(self, data, target):
-        self.data = torch.Tensor(data)
-        self.target = torch.Tensor(target.values)
-    
-    def __getitem__(self, index):
-        datapoint = self.data[index]
-        target = self.target[index]
-        return datapoint, target
 
-
-if __name__ == '__main__':
-    test_df = pd.DataFrame({'a':[1,2,3,4,5,6,7,8,9,10], 'b':[0,0,0,0,0,1,1,1,1,1]})
-    dataset = StocksSeqDataset(test_df['a'], test_df['b'], 3)
-    for seq in dataset:
-        print(seq)

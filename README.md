@@ -45,7 +45,6 @@ The goal of this project is to work on financial markets, try and predict the ch
 ├───helpers                        - general helper files : plots, preprocessing utils, etc.
 │   ├───data_helper.py             - data-related functions compute some features, split data, etc.
 │   ├───preprocessor.py            - LIME model explainer helper    
-│   ├───learning_utils.py
 │   ├───plots_helper.py            - help plot the data and results with pyplot
 │   ├───preprocessor.py
 │   └───__init__.py

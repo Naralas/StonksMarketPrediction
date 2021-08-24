@@ -39,7 +39,7 @@ def explain_model(predict_func, X_train, y_train, data_columns, class_names=[], 
         
 
 def plot_explanation(exp, class_names=[], mode='classification'):
-    """Plot the previously computed explanation
+    """Helper to plot the previously computed explanation.
 
     Args:
         exp (Lime explanation object): Explanation given by the explain_model function.
@@ -47,7 +47,7 @@ def plot_explanation(exp, class_names=[], mode='classification'):
         mode (str, optional): Mode of the model, either 'regression' or 'classfication'. Defaults to 'classification'.
 
     Returns:
-        [type]: [description]
+        Mathplotlib.Pyplot Axes object: Axes of the explanation plot.
     """
     label = list(exp.as_map().keys())[0]
     fig = exp.as_pyplot_figure(label=label)

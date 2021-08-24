@@ -1,6 +1,8 @@
 import pandas as pd
 import os
 
+"""Helper file to transform CSV data into txt data to comply with format provided at the start of the project.
+"""
 
 def main():
     file_path = './data/PEP.csv'
