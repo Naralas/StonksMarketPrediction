@@ -47,7 +47,6 @@ The goal of this project is to work on financial markets, try and predict the ch
 │   ├───explainer.py               - helper explainer for ML models using LIME
 │   ├───preprocessor.py            - preprocessor to standardize data format 
 │   ├───plots_helper.py            - help plot the data and results with pyplot
-│   ├───preprocessor.py
 │   └───__init__.py
 │       
 ├───models                         - model classes for pytorch and keras
